@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>오늘의 사자성어 & 속담</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background-color: #f0f2f5;
+      font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+      color: #111;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 30px 0;
+    }
+    .controls { margin-bottom: 20px; }
+    .print-btn {
+      padding: 10px 24px;
+      font-size: 16px;
+      font-weight: bold;
+      background-color: #1f2937;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .print-btn:hover { background-color: #374151; }
+    .sheet {
+      width: 210mm;
+      min-height: 297mm;
+      padding: 25mm 20mm;
+      background: white;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .header {
+      border-bottom: 3px solid #111;
+      padding-bottom: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+    }
+    .header h1 { font-size: 28pt; font-weight: 800; letter-spacing: -1px; }
+    .header .date { font-size: 14pt; font-weight: 600; color: #444; }
+    .content { display: flex; flex-direction: column; gap: 28px; margin: 25px 0; }
+
+    /* 1. 카드 기본 스타일 (여백 및 테두리 설정) */
+    .card {
+      border: 2px solid #222;
+      border-radius: 8px;
+      padding: 28px;
+    }
+    
+    /* 2. 카드 배경색 (전체적으로 은은하게 깔리는 색상) */
+    #idiomCard {
+      background-color: #EBF1FA; /* 아주 연하고 차분한 파란빛 (사자성어) */
+    }
+    #proverbCard {
+      background-color: #FAF4EB; /* 아주 연하고 따뜻한 베이지빛 (속담) */
+    }
+
+    /* 3. 태그 및 표제어 스타일 */
+    .tag {
+      display: inline-block;
+      font-size: 13pt;
+      font-weight: 700;
+      background: #111;
+      color: #fff;
+      padding: 4px 12px;
+      border-radius: 4px;
+      margin-bottom: 16px;
+    }
+    .phrase {
+      font-size: 34pt;
+      font-weight: 900;
+      letter-spacing: -1px;
+      margin-bottom: 20px;
+    }
+    
+    /* 4. 뜻풀이 영역 */
+    .meaning {
+      font-size: 16pt;
+      line-height: 1.5;
+      font-weight: 600;
+      color: #222;
+      background-color: transparent !important; /* 배경을 완전히 투명하게 강제 적용 */
+      padding: 4px 0 4px 16px; 
+      border-left: 4px solid #111;
+      margin-bottom: 16px;
+    }
+
+    .tag {
+      display: inline-block; font-size: 13pt; font-weight: 700;
+      background: #111; color: #fff; padding: 4px 12px;
+      border-radius: 4px; margin-bottom: 16px;
+    }
+    .phrase { font-size: 34pt; font-weight: 900; letter-spacing: -1px; margin-bottom: 16px; }
+    .meaning {
+      font-size: 16pt; line-height: 1.5; font-weight: 600; color: #222;
+      background: #f8f9fa; padding: 14px 18px; border-left: 4px solid #111; margin-bottom: 14px;
+    }
+    .example { font-size: 13pt; line-height: 1.5; color: #444; }
+    .example strong { color: #111; }
+    /* 하단 학원 로고 및 안내 영역 */
+    .footer-mission {
+      margin-top: 30px;
+      padding-top: 24px;
+      border-top: 2px solid #111; /* 얇은 점선 대신 굵은 실선으로 무게감 부여 */
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .academy-name {
+      font-size: 20pt;
+      font-weight: 900;
+      letter-spacing: 2px;
+      color: #111;
+      background-color: #f8f9fa;
+      padding: 6px 20px;
+      border: 2px solid #111;
+      border-radius: 30px;
+    }
+
+    .mission-desc {
+      font-size: 13pt;
+      font-weight: 600;
+      color: #333;
+      margin-top: 4px;
+    }
+
+    .sub-desc {
+      font-size: 11pt;
+      color: #666;
+    }
+    .mission-title { font-size: 14pt; font-weight: 800; margin-bottom: 6px; }
+    .mission-desc { font-size: 12pt; color: #555; }
+    @page { size: A4 portrait; margin: 0; }
+    @media print {
+      body { 
+        background: transparent; 
+        padding: 0; 
+        /* 배경색 강제 인쇄 설정 */
+        -webkit-print-color-adjust: exact; 
+        print-color-adjust: exact; 
+      }
+      .controls { display: none; }
+      .sheet { box-shadow: none; width: 210mm; height: 297mm; padding: 20mm; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="controls">
+    <button class="print-btn" onclick="window.print()">인쇄하기 (A4)</button>
+  </div>
+
+  <div class="sheet">
+    <div class="header">
+      <h1>오늘의 속담 & 사자성어</h1>
+      <div class="date" id="currentDate">로딩 중...</div>
+    </div>
+
+    <div class="content">
+      <!-- 1. 사자성어 -->
+      <div class="card" id="idiomCard">
+        <div class="tag">사자성어</div>
+        <div class="phrase" id="idiomWord">불러오는 중...</div>
+        <div class="meaning" id="idiomMeaning"></div>
+        <div class="example" id="idiomExample"></div>
+      </div>
+
+      <!-- 2. 속담 -->
+      <div class="card" id="proverbCard">
+        <div class="tag">속담</div>
+        <div class="phrase" id="proverbWord">불러오는 중...</div>
+        <div class="meaning" id="proverbMeaning"></div>
+        <div class="example" id="proverbExample"></div>
+      </div>
+    </div>
+
+    <div class="footer-mission">
+      <div class="academy-name">리딩오션 용천점</div>
+      <div class="mission-desc">매일매일 꾸준하게 성장하는 어휘력!</div>
+    </div>
+  </div>
+
+  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+  <script type="text/javascript">
+    google.charts.load('current', {packages: ['corechart']});
+    google.charts.setOnLoadCallback(initData);
+
+    // 완벽하게 찾아주신 원본 아이디 적용 완료
+    const SHEET_ID = '1bkJ4Ar5dU30DXztT9ljs8dMbZTmabR8J-FbMKqRcwuM';
+    const IDIOM_GID = '167435110';
+    const PROVERB_GID = '143758098';
+
+    function fetchSheetData(gid) {
+      return new Promise((resolve, reject) => {
+        // ★ 에러 원인 해결: d/e/ 가 아니라 d/ 만 쓰도록 수정됨 ★
+        const queryUrl = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?gid=${gid}&tq=SELECT *`;
+        const query = new google.visualization.Query(queryUrl);
+        query.send((response) => {
+          if (response.isError()) {
+            reject(response.getMessage());
+            return;
+          }
+          const dataTable = response.getDataTable();
+          const rows = [];
+          for (let i = 0; i < dataTable.getNumberOfRows(); i++) {
+            const row = [];
+            for (let j = 0; j < dataTable.getNumberOfColumns(); j++) {
+              row.push(dataTable.getValue(i, j));
+            }
+            rows.push(row);
+          }
+          resolve(rows);
+        });
+      });
+    }
+
+    async function initData() {
+      const now = new Date();
+      const formattedDate = `${now.getFullYear()}년 ${now.getMonth() + 1}월 ${now.getDate()}일`;
+      document.getElementById("currentDate").innerText = formattedDate;
+
+      try {
+        const [idiomRows, proverbRows] = await Promise.all([
+          fetchSheetData(IDIOM_GID),
+          fetchSheetData(PROVERB_GID)
+        ]);
+
+        const dateNum = now.getFullYear() * 10000 + (now.getMonth() + 1) * 100 + now.getDate();
+        
+        const idiomIdx = dateNum % idiomRows.length;
+        const proverbIdx = (dateNum + 3) % proverbRows.length; 
+
+        const todayIdiom = idiomRows[idiomIdx];
+        const todayProverb = proverbRows[proverbIdx];
+
+        document.getElementById("idiomWord").innerText = todayIdiom[1] || '';
+        document.getElementById("idiomMeaning").innerText = todayIdiom[2] || '';
+        document.getElementById("idiomExample").innerHTML = `<strong>상황:</strong> ${todayIdiom[3] || ''}`;
+
+        document.getElementById("proverbWord").innerText = todayProverb[1] || '';
+        document.getElementById("proverbMeaning").innerText = todayProverb[2] || '';
+        document.getElementById("proverbExample").innerHTML = `<strong>상황:</strong> ${todayProverb[3] || ''}`;
+
+      } catch (error) {
+        console.error("데이터 로드 실패:", error);
+        document.getElementById("idiomWord").innerText = "데이터 로딩 오류";
+        document.getElementById("idiomMeaning").innerText = "구글 시트 '링크가 있는 모든 사용자(뷰어)' 공유 권한을 확인해 주세요.";
+      }
+    }
+  </script>
+</body>
+</html>
