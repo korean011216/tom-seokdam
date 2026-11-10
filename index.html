@@ -190,8 +190,6 @@
 
     async function initData() {
       const now = new Date();
-      const formattedDate = `${now.getFullYear()}년 ${now.getMonth() + 1}월 ${now.getDate()}일`;
-      document.getElementById("currentDate").innerText = formattedDate;
 
       try {
         const [idiomRows, proverbRows] = await Promise.all([
