@@ -234,11 +234,18 @@
           fetchSheetData(PROVERB_GID)
         ]);
 
-        const dateNum = now.getFullYear() * 10000 + (now.getMonth() + 1) * 100 + now.getDate();
+        // 이번 주 월요일 날짜를 구해서 일주일 내내 같은 숫자가 유지되도록 설정
+        const dayOfWeek = now.getDay(); // 0: 일요일 ~ 6: 토요일
+        const diffToMonday = (dayOfWeek === 0 ? -6 : 1 - dayOfWeek); 
         
-        const idiomIdx = dateNum % idiomRows.length;
-        const proverbIdx = (dateNum + 3) % proverbRows.length; 
-
+        const mondayDate = new Date(now);
+        mondayDate.setDate(now.getDate() + diffToMonday);
+        
+        // 이번 주 월요일을 시드(Seed) 번호로 사용 (예: 20261109)
+        const weekSeed = mondayDate.getFullYear() * 10000 + (mondayDate.getMonth() + 1) * 100 + mondayDate.getDate();
+        
+        const idiomIdx = weekSeed % idiomRows.length;
+        const proverbIdx = (weekSeed + 3) % proverbRows.length;
         const todayIdiom = idiomRows[idiomIdx];
         const todayProverb = proverbRows[proverbIdx];
 
