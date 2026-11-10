@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>오늘의 속담 & 사자성어 2</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background-color: #f0f2f5;
+      font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+      color: #111;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 30px 0;
+    }
+    .controls { margin-bottom: 20px; }
+    .print-btn {
+      padding: 10px 24px;
+      font-size: 16px;
+      font-weight: bold;
+      background-color: #1f2937;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .print-btn:hover { background-color: #374151; }
+    .sheet {
+      width: 210mm;
+      min-height: 297mm;
+      padding: 25mm 20mm;
+      background: white;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .header {
+      border-bottom: 3px solid #111;
+      padding-bottom: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+    }
+    .header h1 { font-size: 28pt; font-weight: 800; letter-spacing: -1px; }
+    .header .date { font-size: 14pt; font-weight: 600; color: #444; }
+    .content { display: flex; flex-direction: column; gap: 28px; margin: 25px 0; }
+
+    .card {
+      border: 2px solid #222;
+      border-radius: 8px;
+      padding: 28px;
+    }
+    #idiomCard { background-color: #EBF1FA; }
+    #proverbCard { background-color: #FAF4EB; }
+
+    .tag {
+      display: inline-block;
+      font-size: 13pt;
+      font-weight: 700;
+      background: #111;
+      color: #fff;
+      padding: 4px 12px;
+      border-radius: 4px;
+      margin-bottom: 16px;
+    }
+    .phrase {
+      font-size: 34pt;
+      font-weight: 900;
+      letter-spacing: -1px;
+      margin-bottom: 20px;
+    }
+    .meaning {
+      font-size: 16pt;
+      line-height: 1.5;
+      font-weight: 600;
+      color: #222;
+      background-color: transparent !important;
+      padding: 4px 0 4px 16px;
+      border-left: 4px solid #111;
+      margin-bottom: 16px;
+    }
+    .example { font-size: 13pt; line-height: 1.5; color: #444; }
+    .example strong { color: #111; }
+
+    .footer-mission {
+      margin-top: 30px;
+      padding-top: 24px;
+      border-top: 2px solid #111;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+    .academy-name {
+      font-size: 20pt;
+      font-weight: 900;
+      letter-spacing: 2px;
+      color: #111;
+      background-color: #f8f9fa;
+      padding: 6px 20px;
+      border: 2px solid #111;
+      border-radius: 30px;
+    }
+    .mission-desc {
+      font-size: 13pt;
+      font-weight: 600;
+      color: #333;
+      margin-top: 4px;
+    }
+
+    @page { size: A4 portrait; margin: 0; }
+    @media print {
+      body {
+        background: transparent;
+        padding: 0;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+      .controls { display: none; }
+      .sheet { box-shadow: none; width: 210mm; height: 297mm; padding: 20mm; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="controls">
+    <button class="print-btn" onclick="window.print()">인쇄하기 (A4)</button>
+  </div>
+
+  <div class="sheet">
+    <div class="header">
+      <h1>오늘의 속담 & 사자성어 2</h1>
+      <div class="date" id="currentDate">로딩 중...</div>
+    </div>
+
+    <div class="content">
+      <div class="card" id="idiomCard">
+        <div class="tag">사자성어</div>
+        <div class="phrase" id="idiomWord">불러오는 중...</div>
+        <div class="meaning" id="idiomMeaning"></div>
+        <div class="example" id="idiomExample"></div>
+      </div>
+
+      <div class="card" id="proverbCard">
+        <div class="tag">속담</div>
+        <div class="phrase" id="proverbWord">불러오는 중...</div>
+        <div class="meaning" id="proverbMeaning"></div>
+        <div class="example" id="proverbExample"></div>
+      </div>
+    </div>
+
+    <div class="footer-mission">
+      <div class="academy-name">리딩오션 용천점</div>
+      <div class="mission-desc">매일매일 꾸준하게 성장하는 어휘력!</div>
+    </div>
+  </div>
+
+  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+  <script type="text/javascript">
+    google.charts.load('current', {packages: ['corechart']});
+    google.charts.setOnLoadCallback(initData);
+
+    const SHEET_ID = '1bkJ4Ar5dU30DXztT9ljs8dMbZTmabR8J-FbMKqRcwuM';
+    const IDIOM_GID = '167435110';
+    const PROVERB_GID = '143758098';
+
+    function fetchSheetData(gid) {
+      return new Promise((resolve, reject) => {
+        const queryUrl = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?gid=${gid}&tq=SELECT *`;
+        const query = new google.visualization.Query(queryUrl);
+        query.send((response) => {
+          if (response.isError()) {
+            reject(response.getMessage());
+            return;
+          }
+          const dataTable = response.getDataTable();
+          const rows = [];
+          for (let i = 0; i < dataTable.getNumberOfRows(); i++) {
+            const row = [];
+            for (let j = 0; j < dataTable.getNumberOfColumns(); j++) {
+              row.push(dataTable.getValue(i, j));
+            }
+            rows.push(row);
+          }
+          resolve(rows);
+        });
+      });
+    }
+
+    async function initData() {
+      const now = new Date();
+      const formattedDate = `${now.getFullYear()}년 ${now.getMonth() + 1}월 ${now.getDate()}일`;
+      document.getElementById("currentDate").innerText = formattedDate;
+
+      try {
+        const [idiomRows, proverbRows] = await Promise.all([
+          fetchSheetData(IDIOM_GID),
+          fetchSheetData(PROVERB_GID)
+        ]);
+
+        const dayOfWeek = now.getDay();
+        const diffToMonday = (dayOfWeek === 0 ? -6 : 1 - dayOfWeek);
+
+        const mondayDate = new Date(now);
+        mondayDate.setDate(now.getDate() + diffToMonday);
+
+        // 월요일 기준 절대 주차 시드 번호
+        const weekSeed = Math.floor(mondayDate.getTime() / (1000 * 60 * 60 * 24 * 7));
+
+        const idiomTotal = idiomRows.length - 1;
+        const proverbTotal = proverbRows.length - 1;
+
+        // 짝수 번째 데이터 가져오기 (행 인덱스: 2, 4, 6, 8...)
+        const idiomPairCount = Math.floor(idiomTotal / 2);
+        const proverbPairCount = Math.floor(proverbTotal / 2);
+
+        const idiomIdx = 2 + ((weekSeed % idiomPairCount) * 2);
+        const proverbIdx = 2 + (((weekSeed + 3) % proverbPairCount) * 2);
+
+        const todayIdiom = idiomRows[idiomIdx];
+        const todayProverb = proverbRows[proverbIdx];
+
+        document.getElementById("idiomWord").innerText = todayIdiom[1] || '';
+        document.getElementById("idiomMeaning").innerText = todayIdiom[2] || '';
+        document.getElementById("idiomExample").innerHTML = `<strong>상황:</strong> ${todayIdiom[3] || ''}`;
+
+        document.getElementById("proverbWord").innerText = todayProverb[1] || '';
+        document.getElementById("proverbMeaning").innerText = todayProverb[2] || '';
+        document.getElementById("proverbExample").innerHTML = `<strong>상황:</strong> ${todayProverb[3] || ''}`;
+
+      } catch (error) {
+        console.error("데이터 로드 실패:", error);
+        document.getElementById("idiomWord").innerText = "데이터 로딩 오류";
+        document.getElementById("idiomMeaning").innerText = "구글 시트 '링크가 있는 모든 사용자(뷰어)' 권한을 확인해 주세요.";
+      }
+    }
+  </script>
+</body>
+</html>
