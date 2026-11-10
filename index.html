@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <title>오늘의 사자성어 & 속담</title>
+  <title>오늘의 속담 & 사자성어 1</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -47,22 +47,14 @@
     .header .date { font-size: 14pt; font-weight: 600; color: #444; }
     .content { display: flex; flex-direction: column; gap: 28px; margin: 25px 0; }
 
-    /* 1. 카드 기본 스타일 (여백 및 테두리 설정) */
     .card {
       border: 2px solid #222;
       border-radius: 8px;
       padding: 28px;
     }
-    
-    /* 2. 카드 배경색 (전체적으로 은은하게 깔리는 색상) */
-    #idiomCard {
-      background-color: #EBF1FA; /* 아주 연하고 차분한 파란빛 (사자성어) */
-    }
-    #proverbCard {
-      background-color: #FAF4EB; /* 아주 연하고 따뜻한 베이지빛 (속담) */
-    }
+    #idiomCard { background-color: #EBF1FA; }
+    #proverbCard { background-color: #FAF4EB; }
 
-    /* 3. 태그 및 표제어 스타일 */
     .tag {
       display: inline-block;
       font-size: 13pt;
@@ -79,42 +71,28 @@
       letter-spacing: -1px;
       margin-bottom: 20px;
     }
-    
-    /* 4. 뜻풀이 영역 */
     .meaning {
       font-size: 16pt;
       line-height: 1.5;
       font-weight: 600;
       color: #222;
-      background-color: transparent !important; /* 배경을 완전히 투명하게 강제 적용 */
-      padding: 4px 0 4px 16px; 
+      background-color: transparent !important;
+      padding: 4px 0 4px 16px;
       border-left: 4px solid #111;
       margin-bottom: 16px;
     }
-
-    .tag {
-      display: inline-block; font-size: 13pt; font-weight: 700;
-      background: #111; color: #fff; padding: 4px 12px;
-      border-radius: 4px; margin-bottom: 16px;
-    }
-    .phrase { font-size: 34pt; font-weight: 900; letter-spacing: -1px; margin-bottom: 16px; }
-    .meaning {
-      font-size: 16pt; line-height: 1.5; font-weight: 600; color: #222;
-      background: #f8f9fa; padding: 14px 18px; border-left: 4px solid #111; margin-bottom: 14px;
-    }
     .example { font-size: 13pt; line-height: 1.5; color: #444; }
     .example strong { color: #111; }
-    /* 하단 학원 로고 및 안내 영역 */
+
     .footer-mission {
       margin-top: 30px;
       padding-top: 24px;
-      border-top: 2px solid #111; /* 얇은 점선 대신 굵은 실선으로 무게감 부여 */
+      border-top: 2px solid #111;
       display: flex;
       flex-direction: column;
       align-items: center;
       gap: 8px;
     }
-
     .academy-name {
       font-size: 20pt;
       font-weight: 900;
@@ -125,7 +103,6 @@
       border: 2px solid #111;
       border-radius: 30px;
     }
-
     .mission-desc {
       font-size: 13pt;
       font-weight: 600;
@@ -133,20 +110,13 @@
       margin-top: 4px;
     }
 
-    .sub-desc {
-      font-size: 11pt;
-      color: #666;
-    }
-    .mission-title { font-size: 14pt; font-weight: 800; margin-bottom: 6px; }
-    .mission-desc { font-size: 12pt; color: #555; }
     @page { size: A4 portrait; margin: 0; }
     @media print {
-      body { 
-        background: transparent; 
-        padding: 0; 
-        /* 배경색 강제 인쇄 설정 */
-        -webkit-print-color-adjust: exact; 
-        print-color-adjust: exact; 
+      body {
+        background: transparent;
+        padding: 0;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
       }
       .controls { display: none; }
       .sheet { box-shadow: none; width: 210mm; height: 297mm; padding: 20mm; }
@@ -161,12 +131,11 @@
 
   <div class="sheet">
     <div class="header">
-      <h1>오늘의 속담 & 사자성어</h1>
+      <h1>오늘의 속담 & 사자성어 1</h1>
       <div class="date" id="currentDate">로딩 중...</div>
     </div>
 
     <div class="content">
-      <!-- 1. 사자성어 -->
       <div class="card" id="idiomCard">
         <div class="tag">사자성어</div>
         <div class="phrase" id="idiomWord">불러오는 중...</div>
@@ -174,7 +143,6 @@
         <div class="example" id="idiomExample"></div>
       </div>
 
-      <!-- 2. 속담 -->
       <div class="card" id="proverbCard">
         <div class="tag">속담</div>
         <div class="phrase" id="proverbWord">불러오는 중...</div>
@@ -194,14 +162,12 @@
     google.charts.load('current', {packages: ['corechart']});
     google.charts.setOnLoadCallback(initData);
 
-    // 완벽하게 찾아주신 원본 아이디 적용 완료
     const SHEET_ID = '1bkJ4Ar5dU30DXztT9ljs8dMbZTmabR8J-FbMKqRcwuM';
     const IDIOM_GID = '167435110';
     const PROVERB_GID = '143758098';
 
     function fetchSheetData(gid) {
       return new Promise((resolve, reject) => {
-        // ★ 에러 원인 해결: d/e/ 가 아니라 d/ 만 쓰도록 수정됨 ★
         const queryUrl = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?gid=${gid}&tq=SELECT *`;
         const query = new google.visualization.Query(queryUrl);
         query.send((response) => {
@@ -234,18 +200,25 @@
           fetchSheetData(PROVERB_GID)
         ]);
 
-        // 이번 주 월요일 날짜를 구해서 일주일 내내 같은 숫자가 유지되도록 설정
-        const dayOfWeek = now.getDay(); // 0: 일요일 ~ 6: 토요일
-        const diffToMonday = (dayOfWeek === 0 ? -6 : 1 - dayOfWeek); 
-        
+        const dayOfWeek = now.getDay();
+        const diffToMonday = (dayOfWeek === 0 ? -6 : 1 - dayOfWeek);
+
         const mondayDate = new Date(now);
         mondayDate.setDate(now.getDate() + diffToMonday);
-        
-        // 이번 주 월요일을 시드(Seed) 번호로 사용 (예: 20261109)
-        const weekSeed = mondayDate.getFullYear() * 10000 + (mondayDate.getMonth() + 1) * 100 + mondayDate.getDate();
-        
-        const idiomIdx = weekSeed % idiomRows.length;
-        const proverbIdx = (weekSeed + 3) % proverbRows.length;
+
+        // 월요일 기준 절대 주차 시드 번호
+        const weekSeed = Math.floor(mondayDate.getTime() / (1000 * 60 * 60 * 24 * 7));
+
+        const idiomTotal = idiomRows.length - 1;
+        const proverbTotal = proverbRows.length - 1;
+
+        // 홀수 번째 데이터 가져오기 (행 인덱스: 1, 3, 5, 7...)
+        const idiomPairCount = Math.floor(idiomTotal / 2);
+        const proverbPairCount = Math.floor(proverbTotal / 2);
+
+        const idiomIdx = 1 + ((weekSeed % idiomPairCount) * 2);
+        const proverbIdx = 1 + (((weekSeed + 3) % proverbPairCount) * 2);
+
         const todayIdiom = idiomRows[idiomIdx];
         const todayProverb = proverbRows[proverbIdx];
 
@@ -260,7 +233,7 @@
       } catch (error) {
         console.error("데이터 로드 실패:", error);
         document.getElementById("idiomWord").innerText = "데이터 로딩 오류";
-        document.getElementById("idiomMeaning").innerText = "구글 시트 '링크가 있는 모든 사용자(뷰어)' 공유 권한을 확인해 주세요.";
+        document.getElementById("idiomMeaning").innerText = "구글 시트 '링크가 있는 모든 사용자(뷰어)' 권한을 확인해 주세요.";
       }
     }
   </script>
