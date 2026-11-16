@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <title>오늘의 속담 & 사자성어 2</title>
+  <title>오늘의 속담 & 사자성어 1</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -44,7 +44,6 @@
       align-items: flex-end;
     }
     .header h1 { font-size: 28pt; font-weight: 800; letter-spacing: -1px; }
-    .header .date { font-size: 14pt; font-weight: 600; color: #444; }
     .content { display: flex; flex-direction: column; gap: 28px; margin: 25px 0; }
 
     .card {
@@ -65,12 +64,47 @@
       border-radius: 4px;
       margin-bottom: 16px;
     }
+
+    /* 사자성어 제목 + 오른쪽 글자별 뜻(훈음) 배치 */
+    .phrase-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
     .phrase {
       font-size: 34pt;
       font-weight: 900;
       letter-spacing: -1px;
+    }
+    #proverbWord {
       margin-bottom: 20px;
     }
+
+    /* 각 글자의 뜻(훈음) 캡슐 스타일 */
+    .char-meanings {
+      display: flex;
+      gap: 8px;
+    }
+    .char-box {
+      background: rgba(255, 255, 255, 0.85);
+      border: 1.5px solid #334155;
+      border-radius: 6px;
+      padding: 6px 12px;
+      font-size: 12.5pt;
+      font-weight: 600;
+      color: #333;
+      text-align: center;
+      white-space: nowrap;
+    }
+    .char-box strong {
+      font-weight: 900;
+      color: #000;
+      margin-left: 2px;
+    }
+
     .meaning {
       font-size: 16pt;
       line-height: 1.5;
@@ -131,17 +165,22 @@
 
   <div class="sheet">
     <div class="header">
-      <h1>오늘의 속담 & 사자성어 2</h1>
+      <h1>오늘의 속담 & 사자성어 1</h1>
     </div>
 
     <div class="content">
+      <!-- 1. 사자성어 -->
       <div class="card" id="idiomCard">
         <div class="tag">사자성어</div>
-        <div class="phrase" id="idiomWord">불러오는 중...</div>
+        <div class="phrase-row">
+          <div class="phrase" id="idiomWord">불러오는 중...</div>
+          <div class="char-meanings" id="idiomChars"></div>
+        </div>
         <div class="meaning" id="idiomMeaning"></div>
         <div class="example" id="idiomExample"></div>
       </div>
 
+      <!-- 2. 속담 -->
       <div class="card" id="proverbCard">
         <div class="tag">속담</div>
         <div class="phrase" id="proverbWord">불러오는 중...</div>
@@ -188,6 +227,28 @@
       });
     }
 
+    // E열의 훈음 텍스트(예: "지을 작 / 마음 심 / 석 삼 / 날 일")를 박스로 변환
+    function renderCharMeanings(rawText) {
+      const container = document.getElementById("idiomChars");
+      container.innerHTML = '';
+      if (!rawText) return;
+
+      const parts = rawText.split(/[\/,|·]/).map(s => s.trim()).filter(Boolean);
+      parts.forEach(part => {
+        const box = document.createElement('div');
+        box.className = 'char-box';
+        const lastSpaceIdx = part.lastIndexOf(' ');
+        if (lastSpaceIdx !== -1) {
+          const hun = part.substring(0, lastSpaceIdx);
+          const eum = part.substring(lastSpaceIdx + 1);
+          box.innerHTML = `${hun} <strong>${eum}</strong>`;
+        } else {
+          box.innerText = part;
+        }
+        container.appendChild(box);
+      });
+    }
+
     async function initData() {
       const now = new Date();
 
@@ -203,16 +264,15 @@
         const mondayDate = new Date(now);
         mondayDate.setDate(now.getDate() + diffToMonday);
 
-        // 월요일 기준 절대 주차 시드 번호
         const weekSeed = Math.floor(mondayDate.getTime() / (1000 * 60 * 60 * 24 * 7));
 
         const idiomTotal = idiomRows.length - 1;
         const proverbTotal = proverbRows.length - 1;
 
-        // 짝수 번째 데이터 가져오기 (행 인덱스: 2, 4, 6, 8...)
         const idiomPairCount = Math.floor(idiomTotal / 2);
         const proverbPairCount = Math.floor(proverbTotal / 2);
 
+        // 짝수 번째 행 선택
         const idiomIdx = 2 + ((weekSeed % idiomPairCount) * 2);
         const proverbIdx = 2 + (((weekSeed + 3) % proverbPairCount) * 2);
 
@@ -222,6 +282,7 @@
         document.getElementById("idiomWord").innerText = todayIdiom[1] || '';
         document.getElementById("idiomMeaning").innerText = todayIdiom[2] || '';
         document.getElementById("idiomExample").innerHTML = `<strong>상황:</strong> ${todayIdiom[3] || ''}`;
+        renderCharMeanings(todayIdiom[4]); // E열(5번째 열) 데이터 표시
 
         document.getElementById("proverbWord").innerText = todayProverb[1] || '';
         document.getElementById("proverbMeaning").innerText = todayProverb[2] || '';
@@ -230,7 +291,7 @@
       } catch (error) {
         console.error("데이터 로드 실패:", error);
         document.getElementById("idiomWord").innerText = "데이터 로딩 오류";
-        document.getElementById("idiomMeaning").innerText = "구글 시트 '링크가 있는 모든 사용자(뷰어)' 권한을 확인해 주세요.";
+        document.getElementById("idiomMeaning").innerText = "구글 시트 공유 권한을 확인해 주세요.";
       }
     }
   </script>
