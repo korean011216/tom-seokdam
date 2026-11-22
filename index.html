@@ -258,13 +258,9 @@
           fetchSheetData(PROVERB_GID)
         ]);
 
-        const dayOfWeek = now.getDay();
-        const diffToMonday = (dayOfWeek === 0 ? -6 : 1 - dayOfWeek);
-
-        const mondayDate = new Date(now);
-        mondayDate.setDate(now.getDate() + diffToMonday);
-
-        const weekSeed = Math.floor(mondayDate.getTime() / (1000 * 60 * 60 * 24 * 7));
+        const sunday = new Date(now.getFullYear(), now.getMonth(), now.getDate() - now.getDay());
+        const utcSunday = Date.UTC(sunday.getFullYear(), sunday.getMonth(), sunday.getDate());
+        const weekSeed = Math.floor(utcSunday / 604800000); // 1주일(ms)
 
         const idiomTotal = idiomRows.length - 1;
         const proverbTotal = proverbRows.length - 1;
